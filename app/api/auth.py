@@ -3,9 +3,9 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from typing_extensions import Dict
 
-from transcription.auth.utils import authenticate_user, create_access_token
-from transcription.config.config import Config, get_config
-from transcription.db.users import Users, get_users
+from app.auth.utils import authenticate_user, create_access_token
+from app.config.config import Config, get_config
+from app.db.users import Users, get_users
 
 router = APIRouter(prefix="/auth")
 

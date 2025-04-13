@@ -3,7 +3,7 @@ from functools import lru_cache
 
 from typing_extensions import Dict
 
-from transcription.config.config import config
+from app.config.config import config
 
 Users = Dict[str, str]
 import os

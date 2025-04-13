@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from transcription.api.auth import router as auth_router
-from transcription.api.transcription import router as transcription_router
+from app.api.auth import router as auth_router
+from app.api.transcription import router as transcription_router
 
 app = FastAPI()
 

@@ -2,8 +2,8 @@ from fastapi import Depends
 from fastapi.datastructures import UploadFile
 from fastapi.routing import APIRouter
 
-from transcription.auth.utils import get_current_user
-from transcription.client.transcription import Transcriptor, get_transcriptor
+from app.auth.utils import get_current_user
+from app.client.transcription import Transcriptor, get_transcriptor
 
 router = APIRouter(prefix="/transcription", dependencies=[Depends(get_current_user)])
 

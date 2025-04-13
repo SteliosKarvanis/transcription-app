@@ -6,8 +6,8 @@ from fastapi.security.oauth2 import OAuth2PasswordBearer, OAuth2PasswordRequestF
 from jwt.exceptions import InvalidTokenError
 from typing_extensions import Dict
 
-from transcription.config.config import Config, get_config
-from transcription.db.users import Users, get_users
+from app.config.config import Config, get_config
+from app.db.users import Users, get_users
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
 

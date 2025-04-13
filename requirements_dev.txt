@@ -8,3 +8,5 @@ torchvision
 torchaudio
 pyjwt[crypto]
 passlib
+black
+pyright

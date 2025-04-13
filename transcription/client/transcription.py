@@ -1,4 +1,5 @@
 from functools import lru_cache
+
 import torch
 from transformers.models.auto.modeling_auto import AutoModelForSpeechSeq2Seq
 from transformers.models.auto.processing_auto import AutoProcessor

@@ -1,7 +1,7 @@
-from typing_extensions import Dict
 from fastapi import Depends, HTTPException, status
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
+from typing_extensions import Dict
 
 from transcription.auth.utils import authenticate_user, create_access_token
 from transcription.config.config import Config, get_config

@@ -23,6 +23,7 @@ async def transcript(
     finally:
         await audio_file.close()
 
+
 @router.get("/health")
 async def health_check():
     return {"status": "healthy"}

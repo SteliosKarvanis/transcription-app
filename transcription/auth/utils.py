@@ -2,8 +2,7 @@ import jwt
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.params import Depends
-from fastapi.security.oauth2 import (OAuth2PasswordBearer,
-                                     OAuth2PasswordRequestForm)
+from fastapi.security.oauth2 import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from typing_extensions import Dict
 

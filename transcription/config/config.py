@@ -1,8 +1,8 @@
 import os
 from functools import lru_cache
 
-from typing_extensions import Optional
 from dotenv import load_dotenv
+from typing_extensions import Optional
 
 # Load environment variables from .env file.
 # By default, it looks for .env in the current directory and its parents.

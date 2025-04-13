@@ -23,12 +23,11 @@ async def transcript(
         print("File Downloaded")
         transcription = transcriptor(local_file_path)
         print("Transcription Done")
+        print(transcription)
         os.remove(local_file_path)
         return {"filename": audio_file.filename, "transcription": transcription}
     except Exception as e:
         return {"error": str(e)}
-    finally:
-        await audio_file.close()
 
 
 @router.get("/health")

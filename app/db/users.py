@@ -6,7 +6,6 @@ from typing_extensions import Dict
 from app.config.config import config
 
 Users = Dict[str, str]
-import os
 
 
 @lru_cache

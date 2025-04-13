@@ -1,0 +1,12 @@
+pydantic<2
+fastapi[standard]
+uvicorn
+transformers
+accelerate
+torch
+torchvision
+torchaudio
+pyjwt[crypto]
+passlib
+black
+pyright

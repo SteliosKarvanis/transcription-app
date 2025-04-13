@@ -1,0 +1,7 @@
+services:
+  app_instance:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:8000"

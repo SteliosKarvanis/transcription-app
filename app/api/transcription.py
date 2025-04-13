@@ -1,3 +1,5 @@
+import os
+
 from fastapi import Depends
 from fastapi.datastructures import UploadFile
 from fastapi.routing import APIRouter
@@ -14,9 +16,12 @@ async def transcript(
 ):
     try:
         contents = await audio_file.read()
-        with open(f"received_{audio_file.filename}", "wb") as f:
+        os.makedirs("input", exist_ok=True)
+        local_file_path = f"input/received_{audio_file.filename}"
+        with open(local_file_path, "wb") as f:
             f.write(contents)
-        transcription = transcriptor(f"received_{audio_file.filename}")
+        transcription = transcriptor(local_file_path)
+        os.remove(local_file_path)
         return {"filename": audio_file.filename, "transcription": transcription}
     except Exception as e:
         return {"error": str(e)}

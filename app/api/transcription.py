@@ -20,7 +20,9 @@ async def transcript(
         local_file_path = f"input/received_{audio_file.filename}"
         with open(local_file_path, "wb") as f:
             f.write(contents)
+        print("File Downloaded")
         transcription = transcriptor(local_file_path)
+        print("Transcription Done")
         os.remove(local_file_path)
         return {"filename": audio_file.filename, "transcription": transcription}
     except Exception as e:

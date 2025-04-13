@@ -10,9 +10,11 @@ routers = [
     transcription_router,
 ]
 
+
 @app.get("/")
 async def root():
     return {"message": "Welcome to the FastAPI application!"}
+
 
 for router in routers:
     app.include_router(router)

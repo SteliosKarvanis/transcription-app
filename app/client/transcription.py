@@ -21,7 +21,6 @@ class Transcriptor:
             low_cpu_mem_usage=True,
             use_safetensors=True,
         )
-        model.to(self._DEVICE)
 
         processor = AutoProcessor.from_pretrained(self._MODEL_ID)
 
@@ -46,3 +45,6 @@ class Transcriptor:
 @lru_cache
 def get_transcriptor() -> Transcriptor:
     return Transcriptor()
+
+
+transcriptor = get_transcriptor()

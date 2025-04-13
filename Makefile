@@ -5,4 +5,4 @@ build_base:
 build:
 	docker build -t app .
 run:
-	docker run -p 80:8000 -d --rm app
+	docker run -p 80:8000 -d app

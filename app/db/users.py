@@ -13,3 +13,6 @@ def get_users() -> Users:
     """Get the users from the configuration file."""
     with open(config.USERS_FILE, "r") as file:
         return json.load(file)
+
+
+users = get_users()

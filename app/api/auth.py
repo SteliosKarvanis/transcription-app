@@ -4,8 +4,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from typing_extensions import Dict
 
 from app.auth.utils import authenticate_user, create_access_token
-from app.config.config import Config, get_config
-from app.db.users import Users, get_users
+from app.config.config import config
+from app.db.users import users
 
 router = APIRouter(prefix="/auth")
 
@@ -13,8 +13,6 @@ router = APIRouter(prefix="/auth")
 @router.post("/")
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    config: Config = Depends(get_config),
-    users: Users = Depends(get_users),
 ) -> Dict[str, str]:
     valid_user = authenticate_user(users, form_data)
     if not valid_user:

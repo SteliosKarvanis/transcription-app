@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 
 import torch
@@ -5,6 +6,9 @@ from transformers.models.auto.modeling_auto import AutoModelForSpeechSeq2Seq
 from transformers.models.auto.processing_auto import AutoProcessor
 from transformers.pipelines import pipeline
 from transformers.pipelines.base import Pipeline
+
+from app.db.tasks import tasks
+from app.models.transcription import TaskStatus
 
 
 class Transcriptor:
@@ -33,13 +37,23 @@ class Transcriptor:
             device=self._DEVICE,
         )
 
-    def __call__(self, audio_file) -> str:
+    def __call__(self, task_id: str) -> None:
+        task = tasks.get_task(task_id=task_id)
+        if task is None:
+            raise ValueError(f"Task {task_id} not found.")
+        tasks.update_task_status(task.task_id, TaskStatus.IN_PROGRESS)
+        # Inference
         transcription = self._model(
-            audio_file,
+            task.local_file_path,
             return_timestamps=True,
             generate_kwargs={"language": "portuguese"},
         )
-        return transcription["text"]  # type: ignore
+        output: str = transcription["text"]  # type: ignore
+        # Save the transcription to a file
+        task.save_output(output)
+        tasks.finish_task(task.task_id, output)
+        # Remove the local file after processing
+        os.remove(task.local_file_path)
 
 
 @lru_cache

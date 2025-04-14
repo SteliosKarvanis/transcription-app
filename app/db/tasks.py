@@ -3,49 +3,43 @@ from functools import lru_cache
 from pydantic import BaseModel
 from typing_extensions import Dict, List, Optional
 
-from app.models.transcription import Task, TaskStatus
+from app.models.transcription import Task
 
 
 class Tasks(BaseModel):
-    tasks: Dict[str, Task] = {}
+    _tasks: Dict[str, Task] = {}
 
-    def update_task(self, task: Task) -> None:
-        self.tasks[task.task_id] = task
-
-    def get_task(self, task_id: str, user: Optional[str] = None) -> Optional[Task]:
-        task = self.tasks.get(task_id)
-        print(f"Task {task_id} Found")
-        print(self.tasks)
-        print(task)
+    def get_task_by_id(
+        self, task_id: str, user: Optional[str] = None
+    ) -> Optional[Task]:
+        task = self._tasks.get(task_id)
         # Get if the task exists
         if not task:
             return None
         # Check if the user is the owner of the task
         if user and task.user != user:
             return None
-        task.refresh()
-        self.update_task(task)
-        return task
+        self._tasks[task_id].refresh()
+        return self._tasks[task_id]
 
-    def get_tasks(self, user: Optional[str] = None) -> List[Task]:
-        tasks = [task for task in self.tasks.values() if not user or task.user == user]
+    def get_tasks_by_user(self, user: str) -> List[Task]:
+        tasks = [task for task in self._tasks.values() if task.user == user]
         for task in tasks:
             task.refresh()
-        return tasks
+        return sorted(tasks, key=lambda x: x.created_at, reverse=True)
 
-    def update_task_status(self, task_id: str, new_status: TaskStatus) -> bool:
-        task = self.tasks.get(task_id)
-        if task:
-            task.status = new_status
-            self.update_task(task)
-        return task is not None
+    def start_task(self, task: Task):
+        # Add task to tasks
+        self._tasks[task.task_id] = task
 
-    def finish_task(self, task_id: str, output: str) -> bool:
-        task = self.get_task(task_id)
-        if task:
-            task.finish(output)
-            self.update_task(task)
-        return task is not None
+    def queue_task(self, task_id: str) -> None:
+        self._tasks[task_id].queue()
+
+    def process_task(self, task_id: str) -> None:
+        self._tasks[task_id].process()
+
+    def finish_task(self, task_id: str, output: str) -> None:
+        self._tasks[task_id].finish(output)
 
 
 @lru_cache

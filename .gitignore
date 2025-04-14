@@ -3,3 +3,5 @@ output/
 media/
 users.json
 .env
+data/
+transcriptions/

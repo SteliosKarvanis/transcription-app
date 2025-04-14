@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field
 from typing_extensions import Optional
 
 from app.config.config import config
@@ -11,25 +11,28 @@ from app.config.config import config
 
 class TaskStatus(str, Enum):
     CREATED = "CREATED"
+    QUEUED = "QUEUED"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
-    QUEUED = "QUEUED"
 
 
 class Task(BaseModel):
-    task_id: str = Field(alias="input_filename")
+    task_id: str
     user: str
     status: TaskStatus = TaskStatus.CREATED
-    start_time: datetime = Field(default_factory=datetime.now)
-    end_time: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    started_at: Optional[datetime] = None
+    ended_at: Optional[datetime] = None
 
-    @root_validator(pre=True)
-    def set_task_id(cls, values):
-        task_id = values.get("task_id")
-        if not task_id:
-            values["task_id"] = str(uuid.uuid4().hex)
-        return values
+    @classmethod
+    def create_task(cls, user: str, filename: Optional[str], content: bytes) -> "Task":
+        task_id = filename or str(uuid.uuid4().hex)
+        task = cls(user=user, task_id=task_id)
+        if not os.path.exists(task.output_file_path):
+            # Write content
+            task.save_content(content)
+        return task
 
     @property
     def local_file_path(self) -> str:
@@ -39,7 +42,15 @@ class Task(BaseModel):
     def output_file_path(self) -> str:
         return f"{config.TRANSCRIPTIONS_DIR}/{self.task_id.rsplit('.', maxsplit=1)[-1]}.txt"
 
-    def load_content(self, content: bytes) -> None:
+    @property
+    def active(self) -> bool:
+        return self.status in {
+            TaskStatus.QUEUED,
+            TaskStatus.IN_PROGRESS,
+            TaskStatus.CREATED,
+        }
+
+    def save_content(self, content: bytes) -> None:
         os.makedirs(config.DATA_DIR, exist_ok=True)
         with open(self.local_file_path, "wb") as f:
             f.write(content)
@@ -49,8 +60,22 @@ class Task(BaseModel):
         with open(self.output_file_path, "w") as f:
             f.write(output)
 
+    def read_output(self) -> Optional[str]:
+        if os.path.exists(self.output_file_path):
+            with open(self.output_file_path, "r") as f:
+                return f.read()
+        return None
+
+    def queue(self) -> None:
+        if self.status == TaskStatus.CREATED:
+            self.status = TaskStatus.QUEUED
+
+    def process(self) -> None:
+        self.status = TaskStatus.IN_PROGRESS
+        self.started_at = datetime.now()
+
     def finish(self, output: str) -> None:
-        self.end_time = datetime.now()
+        self.ended_at = datetime.now()
         self.status = TaskStatus.COMPLETED
         with open(self.output_file_path, "w") as f:
             f.write(output)
@@ -58,7 +83,24 @@ class Task(BaseModel):
     def refresh(self) -> None:
         """Refresh the task status and check for timeout."""
         end_time = datetime.now()
-        time_diff = end_time - self.start_time
-        if time_diff.total_seconds() > config.TASK_TIMEOUT:
+        time_diff = end_time - self.created_at
+        if self.active and time_diff.total_seconds() > config.TASK_TIMEOUT:
             self.status = TaskStatus.FAILED
-            self.end_time = end_time
+            self.ended_at = end_time
+
+
+class TaskResponse(Task):
+    output: Optional[str] = None
+
+    @classmethod
+    def from_task(cls, task: Task) -> "TaskResponse":
+        output = task.read_output()
+        return cls(
+            task_id=task.task_id,
+            user=task.user,
+            status=task.status,
+            created_at=task.created_at,
+            started_at=task.started_at,
+            ended_at=task.ended_at,
+            output=output,
+        )

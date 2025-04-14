@@ -8,7 +8,7 @@ from transformers.pipelines import pipeline
 from transformers.pipelines.base import Pipeline
 
 from app.db.tasks import tasks
-from app.models.transcription import TaskStatus
+from app.models.transcription import Task, TaskStatus
 
 
 class Transcriptor:
@@ -37,11 +37,8 @@ class Transcriptor:
             device=self._DEVICE,
         )
 
-    def __call__(self, task_id: str) -> None:
-        task = tasks.get_task(task_id=task_id)
-        if task is None:
-            raise ValueError(f"Task {task_id} not found.")
-        tasks.update_task_status(task.task_id, TaskStatus.IN_PROGRESS)
+    def __call__(self, task: Task) -> None:
+        tasks.process_task(task.task_id)
         # Inference
         transcription = self._model(
             task.local_file_path,
@@ -50,7 +47,6 @@ class Transcriptor:
         )
         output: str = transcription["text"]  # type: ignore
         # Save the transcription to a file
-        task.save_output(output)
         tasks.finish_task(task.task_id, output)
         # Remove the local file after processing
         os.remove(task.local_file_path)

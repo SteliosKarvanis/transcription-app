@@ -36,11 +36,16 @@ class Task(BaseModel):
 
     @property
     def local_file_path(self) -> str:
-        return f"{config.DATA_DIR}/{self.task_id}"
+        os.makedirs(config.TRANSCRIPTIONS_DIR, exist_ok=True)
+        os.makedirs(f"{config.DATA_DIR}/{self.user}", exist_ok=True)
+        return f"{config.DATA_DIR}/{self.user}/{self.task_id}"
 
     @property
     def output_file_path(self) -> str:
-        return f"{config.TRANSCRIPTIONS_DIR}/{self.task_id.rsplit('.', maxsplit=1)[-1]}.txt"
+        os.makedirs(config.DATA_DIR, exist_ok=True)
+        os.makedirs(f"{config.TRANSCRIPTIONS_DIR}/{self.user}", exist_ok=True)
+        filename = self.task_id.rsplit("/", maxsplit=1)[-1].split(".", maxsplit=1)[0]
+        return f"{config.TRANSCRIPTIONS_DIR}/{self.user}/{filename}.txt"
 
     @property
     def active(self) -> bool:
@@ -51,12 +56,10 @@ class Task(BaseModel):
         }
 
     def save_content(self, content: bytes) -> None:
-        os.makedirs(config.DATA_DIR, exist_ok=True)
         with open(self.local_file_path, "wb") as f:
             f.write(content)
 
     def save_output(self, output: str) -> None:
-        os.makedirs(config.TRANSCRIPTIONS_DIR, exist_ok=True)
         with open(self.output_file_path, "w") as f:
             f.write(output)
 

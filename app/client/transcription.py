@@ -48,8 +48,6 @@ class Transcriptor:
         output: str = transcription["text"]  # type: ignore
         # Save the transcription to a file
         tasks.finish_task(task.task_id, output)
-        # Remove the local file after processing
-        os.remove(task.local_file_path)
 
 
 @lru_cache

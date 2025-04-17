@@ -4,8 +4,9 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 from typing_extensions import Optional
-
+import uuid
 from app.config.config import config
+from moviepy import VideoFileClip
 
 
 class TaskStatus(str, Enum):
@@ -17,6 +18,7 @@ class TaskStatus(str, Enum):
 
 
 class Task(BaseModel):
+    task_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     sender_file_path: str
     user: str
     status: TaskStatus = TaskStatus.CREATED
@@ -33,20 +35,22 @@ class Task(BaseModel):
         return task
 
     @property
-    def task_id(self) -> str:
-        return self.sender_file_path.rsplit("/", maxsplit=1)[-1].split(".")[0]
-
-    @property
-    def local_file_path(self) -> str:
+    def local_video_file_path(self) -> str:
         os.makedirs(config.TRANSCRIPTIONS_DIR, exist_ok=True)
         os.makedirs(f"{config.DATA_DIR}/{self.user}", exist_ok=True)
-        return f"{config.DATA_DIR}/{self.user}/{self.task_id}"
+        return f"{config.DATA_DIR}/{self.user}/{self.task_id}.mp4"
+
+    @property
+    def local_audio_file_path(self) -> str:
+        os.makedirs(config.TRANSCRIPTIONS_DIR, exist_ok=True)
+        os.makedirs(f"{config.DATA_DIR}/{self.user}", exist_ok=True)
+        return f"{config.DATA_DIR}/{self.user}/{self.task_id}.mp3"
 
     @property
     def output_file_path(self) -> str:
         os.makedirs(config.DATA_DIR, exist_ok=True)
         os.makedirs(f"{config.TRANSCRIPTIONS_DIR}/{self.user}", exist_ok=True)
-        
+
         return f"{config.TRANSCRIPTIONS_DIR}/{self.user}/{self.task_id}.txt"
 
     @property
@@ -58,8 +62,17 @@ class Task(BaseModel):
         }
 
     def save_content(self, content: bytes) -> None:
-        with open(self.local_file_path, "wb") as f:
+        with open(self.local_video_file_path, "wb") as f:
             f.write(content)
+        print("Video Saved")
+        with open(self.local_audio_file_path, "wb") as f:
+            video = VideoFileClip(self.local_video_file_path)
+            audio = video.audio
+            audio.write_audiofile(self.local_audio_file_path)  # type: ignore
+            video.close()
+        print("Audio Saved")
+        os.remove(self.local_video_file_path)
+        print("Video Removed")
 
     def save_output(self, output: str) -> None:
         with open(self.output_file_path, "w") as f:

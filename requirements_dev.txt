@@ -10,3 +10,4 @@ pyjwt[crypto]
 passlib
 black
 pyright
+moviepy

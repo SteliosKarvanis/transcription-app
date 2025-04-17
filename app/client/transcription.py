@@ -1,4 +1,3 @@
-import os
 from functools import lru_cache
 
 import torch
@@ -8,7 +7,7 @@ from transformers.pipelines import pipeline
 from transformers.pipelines.base import Pipeline
 
 from app.db.tasks import tasks
-from app.models.transcription import Task, TaskStatus
+from app.models.transcription import Task
 
 
 class Transcriptor:
@@ -41,7 +40,7 @@ class Transcriptor:
         tasks.process_task(task.task_id)
         # Inference
         transcription = self._model(
-            task.local_file_path,
+            task.local_audio_file_path,
             return_timestamps=True,
             generate_kwargs={"language": "portuguese"},
         )

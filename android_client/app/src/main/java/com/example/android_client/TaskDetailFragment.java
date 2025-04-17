@@ -1,7 +1,9 @@
 package com.example.android_client;
 
+import android.media.session.MediaController;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +18,10 @@ import com.example.android_client.models.Task;
 public class TaskDetailFragment extends Fragment {
 
     private FragmentTaskDetailBinding binding;
-
-    private static final String ARG_VIDEO = "video_path";
-    private static final String ARG_DESC = "transcription";
-
+    private static final String ARG_TASK = "task";
     public static TaskDetailFragment newInstance(Task task) {
         Bundle args = new Bundle();
-        args.putString(ARG_VIDEO, task.task_id);
-        args.putString(ARG_DESC, task.transcription);
+        args.putSerializable(ARG_TASK, task);
 
         TaskDetailFragment fragment = new TaskDetailFragment();
         fragment.setArguments(args);
@@ -38,11 +36,11 @@ public class TaskDetailFragment extends Fragment {
         binding = FragmentTaskDetailBinding.inflate(inflater, container, false);
         Bundle args = getArguments();
         if (args != null) {
-            String videoPath = args.getString(ARG_VIDEO);
-            String desc = args.getString(ARG_DESC);
-
-            binding.videoView.setVideoURI(Uri.parse(videoPath));
-            binding.transcription.setText(desc);
+            Task task = (Task) getArguments().getSerializable(ARG_TASK);
+            Log.d("Task Detail", task.local_path);
+            Uri videoUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.video);
+            binding.videoView.setVideoURI(videoUri);
+            binding.transcription.setText(task.transcription);
         }
         return binding.getRoot();
 

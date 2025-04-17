@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,7 +29,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        return new ViewHolder(TaskItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(TaskItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), listener);
 
     }
 
@@ -51,11 +52,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         public final TextView taskIdText;
         public final TextView statusText;
 
-        public ViewHolder(TaskItemBinding binding) {
+        public ViewHolder(TaskItemBinding binding, TaskListFragment.OnTaskSelectedListener listener) {
             super(binding.getRoot());
             imageView = binding.imageView;
             statusText = binding.taskStatus;
             taskIdText = binding.taskId;
+            binding.getRoot().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = getAbsoluteAdapterPosition();
+                    listener.onTaskSelected(tasks.get(pos));
+                }
+            });
         }
     }
 }

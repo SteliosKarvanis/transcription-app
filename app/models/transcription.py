@@ -1,5 +1,4 @@
 import os
-import uuid
 from datetime import datetime
 from enum import Enum
 
@@ -18,7 +17,7 @@ class TaskStatus(str, Enum):
 
 
 class Task(BaseModel):
-    task_id: str
+    sender_file_path: str
     user: str
     status: TaskStatus = TaskStatus.CREATED
     created_at: datetime = Field(default_factory=datetime.now)
@@ -26,13 +25,16 @@ class Task(BaseModel):
     ended_at: Optional[datetime] = None
 
     @classmethod
-    def create_task(cls, user: str, filename: Optional[str], content: bytes) -> "Task":
-        task_id = filename or str(uuid.uuid4().hex)
-        task = cls(user=user, task_id=task_id)
+    def create_task(cls, user: str, sender_file_path: str, content: bytes) -> "Task":
+        task = cls(user=user, sender_file_path=sender_file_path)
         if not os.path.exists(task.output_file_path):
             # Write content
             task.save_content(content)
         return task
+
+    @property
+    def task_id(self) -> str:
+        return self.sender_file_path.rsplit("/", maxsplit=1)[-1].split(".")[0]
 
     @property
     def local_file_path(self) -> str:
@@ -44,8 +46,8 @@ class Task(BaseModel):
     def output_file_path(self) -> str:
         os.makedirs(config.DATA_DIR, exist_ok=True)
         os.makedirs(f"{config.TRANSCRIPTIONS_DIR}/{self.user}", exist_ok=True)
-        filename = self.task_id.rsplit("/", maxsplit=1)[-1].split(".", maxsplit=1)[0]
-        return f"{config.TRANSCRIPTIONS_DIR}/{self.user}/{filename}.txt"
+        
+        return f"{config.TRANSCRIPTIONS_DIR}/{self.user}/{self.task_id}.txt"
 
     @property
     def active(self) -> bool:
@@ -99,11 +101,6 @@ class TaskResponse(Task):
     def from_task(cls, task: Task) -> "TaskResponse":
         output = task.read_output()
         return cls(
-            task_id=task.task_id,
-            user=task.user,
-            status=task.status,
-            created_at=task.created_at,
-            started_at=task.started_at,
-            ended_at=task.ended_at,
-            output=output,
+            **task.dict(),  # Unpack the task attributes
+            output=output,  # Include the output attribute
         )

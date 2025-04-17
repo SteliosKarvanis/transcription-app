@@ -1,14 +1,15 @@
 package com.example.android_client;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.android_client.databinding.FragmentTaskListBinding;
@@ -20,11 +21,11 @@ import java.util.List;
 public class TaskListFragment extends Fragment {
 
     private FragmentTaskListBinding binding;
+    private OnTaskSelectedListener listener;
 
     public interface OnTaskSelectedListener {
         void onTaskSelected(Task task);
     }
-    private OnTaskSelectedListener listener;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -39,7 +40,7 @@ public class TaskListFragment extends Fragment {
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-
+        Log.d("Task List Fragment", "View Created");
         binding = FragmentTaskListBinding.inflate(inflater, container, false);
         binding.tasksList.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.tasksList.setAdapter(new TaskAdapter(getTasks(), listener));
@@ -65,8 +66,8 @@ public class TaskListFragment extends Fragment {
 
     private List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task("task 1", "Stelios", "FINISHED", ""));
-        tasks.add(new Task("task 2", "Stelios", "FINISHED", "aaaa"));
+        tasks.add(new Task("task 1", "video.mp4", "Stelios", "FINISHED", ""));
+        tasks.add(new Task("task 2", "video.mp4", "Stelios", "FINISHED", "aaaa"));
         return tasks;
     }
 }

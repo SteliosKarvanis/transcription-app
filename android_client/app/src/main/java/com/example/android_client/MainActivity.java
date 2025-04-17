@@ -1,50 +1,66 @@
 package com.example.android_client;
 
+import static android.app.PendingIntent.getActivity;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.example.android_client.models.Task;
-import com.google.android.material.snackbar.Snackbar;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.view.View;
-
+import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.android_client.databinding.ActivityMainBinding;
+import com.google.android.material.snackbar.Snackbar;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity implements TaskListFragment.OnTaskSelectedListener {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+    private ActivityResultLauncher<Intent> filePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        // Bind the activity layout
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-//        binding.fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAnchorView(R.id.fab)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+//        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+//        ActivityCompat.requestPermissions(
+//                getActivity(binding.getRoot().getContext()),
+//                new String[]{Manifest.permission.READ_MEDIA_VIDEO},
+//                101
+//        );
+        filePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        Uri fileUri = result.getData().getData();
+//                        sendFileToApi(fileUri);
+                        Snackbar.make(binding.getRoot(), "Video Enviado Para Transacrição", 5);
+                    }
+                }
+        );
+        binding.fab.setOnClickListener(v -> openVideoChooser());
     }
 
     @Override
@@ -83,5 +99,11 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
                 .replace(R.id.nav_host_fragment_content_main, detailFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+    private void openVideoChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("video/*");  // Only show videos
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        filePickerLauncher.launch(Intent.createChooser(intent, "Escolha um Video"));
     }
 }

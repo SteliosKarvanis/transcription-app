@@ -5,3 +5,5 @@ users.json
 .env
 data/
 transcriptions/
+android_client/.idea/
+android_client/app/src/main/res/raw/

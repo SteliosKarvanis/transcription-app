@@ -20,7 +20,7 @@ async def transcript(
     transcriptor: Transcriptor = Depends(get_transcriptor),
 ):
     new_task = Task.create_task(
-        user=user, filename=audio_file.filename, content=await audio_file.read()
+        user=user, sender_file_path=audio_file.filename, content=await audio_file.read() #type: ignore
     )
     # Check if the task already exists
     existent_task = tasks.get_task_by_id(new_task.task_id, user)

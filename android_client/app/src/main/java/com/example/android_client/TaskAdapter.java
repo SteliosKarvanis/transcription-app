@@ -3,13 +3,9 @@ package com.example.android_client;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android_client.databinding.TaskItemBinding;
@@ -47,8 +43,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         TaskPromise task = tasks.get(position);
-        Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(task.task_id, MediaStore.Images.Thumbnails.MINI_KIND);
-        holder.imageView.setImageBitmap(thumbnail);
+        holder.dateStr.setText(task.last_requested_at.toLocalDate().toString());
         holder.taskIdText.setText(task.task_id);
         holder.statusText.setText(task.status);
     }
@@ -59,13 +54,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final ImageView imageView;
+        public final TextView dateStr;
         public final TextView taskIdText;
         public final TextView statusText;
 
         public ViewHolder(TaskItemBinding binding) {
             super(binding.getRoot());
-            imageView = binding.imageView;
+            dateStr = binding.dateStr;
             statusText = binding.taskStatus;
             taskIdText = binding.taskId;
             binding.getRoot().setOnClickListener(new View.OnClickListener() {

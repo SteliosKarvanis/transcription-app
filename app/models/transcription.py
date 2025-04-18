@@ -110,15 +110,15 @@ class Task(BaseModel):
 class TaskResult(BaseModel):
     task_id: str
     sender_file_path: str
-    output: Optional[str] = None
+    transcription: Optional[str] = None
 
     @classmethod
     def from_task(cls, task: Task) -> "TaskResult":
-        output = task.read_output()
+        transcription = task.read_output()
         return cls(
             task_id=task.task_id,
             sender_file_path=task.sender_file_path,
-            output=output,  # Include the output attribute
+            transcription=transcription,  # Include the output attribute
         )
 
 class TaskPromise(BaseModel):

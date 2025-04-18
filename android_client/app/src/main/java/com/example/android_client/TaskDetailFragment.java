@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,9 +45,11 @@ public class TaskDetailFragment extends Fragment {
 
         binding = FragmentTaskDetailBinding.inflate(inflater, container, false);
         Bundle args = getArguments();
+        Log.d("Task Details", args.toString());
         if (args != null) {
             TaskPromise task = (TaskPromise) args.getSerializable(ARG_TASK);
             Uri videoUri = Uri.parse("content://media" + task.sender_file_path);
+            fetchTranscription(task.task_id);
             binding.videoView.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
@@ -54,7 +57,6 @@ public class TaskDetailFragment extends Fragment {
                             Intent intent = new Intent(Intent.ACTION_VIEW);
                             intent.setDataAndType(videoUri, "video/*");
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // Optional but often necessary
-
                             // Check if there's an app to handle this intent
                             if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
                                 startActivity(intent);
@@ -64,7 +66,6 @@ public class TaskDetailFragment extends Fragment {
                         }
                     }
             );
-            fetchTranscription(task.task_id);
         }
         binding.printButton.setOnClickListener(v -> createWebViewAndPrint());
         return binding.getRoot();
@@ -98,7 +99,7 @@ public class TaskDetailFragment extends Fragment {
     }
     private void fetchTranscription(String taskId) {
         Request request = new Request.Builder()
-                .url("http://168.231.89.123/task/" + taskId)
+                .url("http://168.231.89.123/transcription/task/" + taskId)
                 .addHeader("Authorization", "Bearer " + token)
                 .build();
         OkHttpClient client = new OkHttpClient();
@@ -106,6 +107,7 @@ public class TaskDetailFragment extends Fragment {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Log.d("Request", "Failed");
                 // Optionally show error in UI
             }
 
@@ -113,9 +115,10 @@ public class TaskDetailFragment extends Fragment {
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     // Handle unsuccessful
+                    Log.d("Request", "Failed 2");
                     return;
                 }
-
+                Log.d("Request", "Successfull");
                 String json = response.body().string();
                 TaskResult taskResult = TaskResult.fromJson(json);
                 getActivity().runOnUiThread(() -> setElements(taskResult));
@@ -123,6 +126,7 @@ public class TaskDetailFragment extends Fragment {
         });
     }
     private void setElements(TaskResult taskResponse) {
+        Log.d("Task", "Setting Transcription: "  + taskResponse.transcription);
         binding.transcription.setText(taskResponse.transcription);
     }
 }

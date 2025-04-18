@@ -6,8 +6,7 @@ from pydantic import BaseModel, Field
 from typing_extensions import Optional
 import uuid
 from app.config.config import config
-from moviepy import VideoFileClip
-
+import subprocess
 
 class TaskStatus(str, Enum):
     CREATED = "CREATED"
@@ -65,11 +64,8 @@ class Task(BaseModel):
         with open(self.local_video_file_path, "wb") as f:
             f.write(content)
         print("Video Saved")
-        with open(self.local_audio_file_path, "wb") as f:
-            video = VideoFileClip(self.local_video_file_path)
-            audio = video.audio
-            audio.write_audiofile(self.local_audio_file_path)  # type: ignore
-            video.close()
+        process = subprocess.Popen(['ffmpeg', '-y', '-i', 'video.mp4', '-q:a', '0', '-map', 'a', 'video.mp3'])
+        process.wait()
         print("Audio Saved")
         os.remove(self.local_video_file_path)
         print("Video Removed")

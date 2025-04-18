@@ -15,18 +15,13 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.android_client.databinding.FragmentTaskDetailBinding;
 import com.example.android_client.models.Task;
 
+import java.io.File;
+
 public class TaskDetailFragment extends Fragment {
 
     private FragmentTaskDetailBinding binding;
-    private static final String ARG_TASK = "task";
-    public static TaskDetailFragment newInstance(Task task) {
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_TASK, task);
+    public static final String ARG_TASK = "task";
 
-        TaskDetailFragment fragment = new TaskDetailFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -36,10 +31,15 @@ public class TaskDetailFragment extends Fragment {
         binding = FragmentTaskDetailBinding.inflate(inflater, container, false);
         Bundle args = getArguments();
         if (args != null) {
-            Task task = (Task) getArguments().getSerializable(ARG_TASK);
+            Task task = (Task) args.getSerializable(ARG_TASK);
             Log.d("Task Detail", task.local_path);
-            Uri videoUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.video);
-            binding.videoView.setVideoURI(videoUri);
+            String videoPath = "/sdcard/Download/video.mp4";
+            File file = new File(videoPath);
+            Log.d("Video Exists", String.valueOf(file.exists()));
+            Uri videoUri = Uri.parse(videoPath);
+//            Uri videoUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.video);
+            binding.videoView.setVideoPath(videoPath);
+            binding.videoView.start();
             binding.transcription.setText(task.transcription);
         }
         return binding.getRoot();

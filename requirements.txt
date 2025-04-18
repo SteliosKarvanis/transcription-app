@@ -8,4 +8,3 @@ torchvision
 torchaudio
 pyjwt[crypto]
 passlib
-moviepy

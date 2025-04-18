@@ -1,5 +1,6 @@
 package com.example.android_client;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Bitmap;
@@ -19,17 +20,22 @@ import java.util.List;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private final List<Task> tasks;
-    private TaskListFragment.OnTaskSelectedListener listener;
+    private OnTaskSelectedListener listener;
 
-    public TaskAdapter(List<Task> tasks, TaskListFragment.OnTaskSelectedListener listener) {
+    public interface OnTaskSelectedListener {
+        void onTaskSelected(Task task);
+    }
+
+    public TaskAdapter(List<Task> tasks, OnTaskSelectedListener listener) {
         this.tasks = tasks;
         this.listener = listener;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        return new ViewHolder(TaskItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), listener);
+        return new ViewHolder(TaskItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 
     }
 
@@ -52,7 +58,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         public final TextView taskIdText;
         public final TextView statusText;
 
-        public ViewHolder(TaskItemBinding binding, TaskListFragment.OnTaskSelectedListener listener) {
+        public ViewHolder(TaskItemBinding binding) {
             super(binding.getRoot());
             imageView = binding.imageView;
             statusText = binding.taskStatus;

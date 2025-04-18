@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.android_client.databinding.FragmentTaskListBinding;
@@ -21,18 +23,10 @@ import java.util.List;
 public class TaskListFragment extends Fragment {
 
     private FragmentTaskListBinding binding;
-    private OnTaskSelectedListener listener;
-
-    public interface OnTaskSelectedListener {
-        void onTaskSelected(Task task);
-    }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof OnTaskSelectedListener) {
-            listener = (OnTaskSelectedListener) context;
-        }
     }
 
     @Override
@@ -40,10 +34,9 @@ public class TaskListFragment extends Fragment {
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-        Log.d("Task List Fragment", "View Created");
         binding = FragmentTaskListBinding.inflate(inflater, container, false);
         binding.tasksList.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.tasksList.setAdapter(new TaskAdapter(getTasks(), listener));
+        binding.tasksList.setAdapter(new TaskAdapter(getTasks(), onTaskClicked()));
 
         return binding.getRoot();
 
@@ -51,11 +44,6 @@ public class TaskListFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-//        binding.buttonFirst.setOnClickListener(v ->
-//                NavHostFragment.findNavController(FirstFragment.this)
-//                        .navigate(R.id.action_FirstFragment_to_SecondFragment)
-//        );
     }
 
     @Override
@@ -66,8 +54,20 @@ public class TaskListFragment extends Fragment {
 
     private List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task("task 1", "video.mp4", "Stelios", "FINISHED", ""));
-        tasks.add(new Task("task 2", "video.mp4", "Stelios", "FINISHED", "aaaa"));
+        tasks.add(new Task("task 1", "/document/raw:/storage/emulated/0/Download/video.mp4", "Stelios", "FINISHED", ""));
+        tasks.add(new Task("task 2", "/document/raw:/storage/emulated/0/Download/video.mp4", "Stelios", "FINISHED", "aaaa"));
         return tasks;
+    }
+
+    private TaskAdapter.OnTaskSelectedListener onTaskClicked() {
+        return new TaskAdapter.OnTaskSelectedListener(){
+            @Override
+            public void onTaskSelected(Task task) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(TaskDetailFragment.ARG_TASK, task);
+                NavHostFragment.findNavController(TaskListFragment.this)
+                        .navigate(R.id.action_FirstFragment_to_SecondFragment, bundle);
+            }
+        };
     }
 }

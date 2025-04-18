@@ -51,7 +51,7 @@ async def health_check():
     return {"status": "healthy"}
 
 
-@router.get("/tasks", response_model=List[Task])
+@router.get("/tasks", response_model=List[TaskPromise])
 async def get_all_tasks(
     user: str = Depends(get_current_user),
 ):

@@ -3,7 +3,7 @@ from functools import lru_cache
 from pydantic import BaseModel
 from typing_extensions import Dict, List, Optional
 
-from app.models.transcription import Task
+from app.models.transcription import Task, TaskPromise
 
 
 class Tasks(BaseModel):
@@ -22,11 +22,11 @@ class Tasks(BaseModel):
         self._tasks[task_id].refresh()
         return self._tasks[task_id]
 
-    def get_tasks_by_user(self, user: str) -> List[Task]:
+    def get_tasks_by_user(self, user: str) -> List[TaskPromise]:
         tasks = [task for task in self._tasks.values() if task.user == user]
         for task in tasks:
             task.refresh()
-        return sorted(tasks, key=lambda x: x.created_at, reverse=True)
+        return sorted([TaskPromise.from_task(task) for task in tasks], key=lambda x: x.last_requested_at, reverse=True)
 
     def start_task(self, task: Task):
         # Add task to tasks

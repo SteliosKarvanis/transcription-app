@@ -1,17 +1,12 @@
 package com.example.android_client;
 
-import static android.content.Context.PRINT_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
-
 import android.content.Context;
 import android.content.Intent;
-import android.media.session.MediaController;
 import android.net.Uri;
 import android.os.Bundle;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,13 +16,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.android_client.databinding.FragmentTaskDetailBinding;
-import com.example.android_client.models.Task;
-import com.example.android_client.models.TaskResponse;
+import com.example.android_client.models.TaskPromise;
+import com.example.android_client.models.TaskResult;
 
-import java.io.File;
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -52,7 +45,7 @@ public class TaskDetailFragment extends Fragment {
         binding = FragmentTaskDetailBinding.inflate(inflater, container, false);
         Bundle args = getArguments();
         if (args != null) {
-            Task task = (Task) args.getSerializable(ARG_TASK);
+            TaskPromise task = (TaskPromise) args.getSerializable(ARG_TASK);
             Uri videoUri = Uri.parse("content://media" + task.sender_file_path);
             binding.videoView.setOnClickListener(
                     new View.OnClickListener() {
@@ -124,12 +117,12 @@ public class TaskDetailFragment extends Fragment {
                 }
 
                 String json = response.body().string();
-                TaskResponse taskResponse = TaskResponse.fromJson(json);
-                getActivity().runOnUiThread(() -> setElements(taskResponse));
+                TaskResult taskResult = TaskResult.fromJson(json);
+                getActivity().runOnUiThread(() -> setElements(taskResult));
             }
         });
     }
-    private void setElements(TaskResponse taskResponse) {
+    private void setElements(TaskResult taskResponse) {
         binding.transcription.setText(taskResponse.transcription);
     }
 }

@@ -41,6 +41,8 @@ class Tasks(BaseModel):
     def finish_task(self, task_id: str, output: str) -> None:
         self._tasks[task_id].finish(output)
 
+    def update_task_request(self, task_id: str) -> None:
+        self._tasks[task_id].update_request()
 
 @lru_cache
 def get_tasks() -> Tasks:

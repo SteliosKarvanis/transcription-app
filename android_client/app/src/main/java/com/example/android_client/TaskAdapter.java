@@ -12,27 +12,27 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android_client.models.Task;
 import com.example.android_client.databinding.TaskItemBinding;
+import com.example.android_client.models.TaskPromise;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
-    private List<Task> tasks;
+    private List<TaskPromise> tasks;
     private OnTaskSelectedListener listener;
 
     public interface OnTaskSelectedListener {
-        void onTaskSelected(Task task);
+        void onTaskSelected(TaskPromise task);
     }
-    public void setTasks(List<Task> tasks) {
+    public void setTasks(List<TaskPromise> tasks) {
         this.tasks.clear();
         this.tasks.addAll(tasks);
         notifyDataSetChanged();
     }
     public TaskAdapter(OnTaskSelectedListener listener) {
-        this.tasks = new ArrayList<Task>();
+        this.tasks = new ArrayList<TaskPromise>();
         this.listener = listener;
     }
 
@@ -46,7 +46,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        Task task = tasks.get(position);
+        TaskPromise task = tasks.get(position);
         Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(task.task_id, MediaStore.Images.Thumbnails.MINI_KIND);
         holder.imageView.setImageBitmap(thumbnail);
         holder.taskIdText.setText(task.task_id);

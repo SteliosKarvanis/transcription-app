@@ -12,7 +12,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.android_client.databinding.FragmentTaskListBinding;
-import com.example.android_client.models.Task;
+import com.example.android_client.models.TaskPromise;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -88,7 +88,7 @@ public class TaskListFragment extends Fragment {
     private TaskAdapter.OnTaskSelectedListener onTaskClicked() {
         return new TaskAdapter.OnTaskSelectedListener(){
             @Override
-            public void onTaskSelected(Task task) {
+            public void onTaskSelected(TaskPromise task) {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(TaskDetailFragment.ARG_TASK, task);
                 NavHostFragment.findNavController(TaskListFragment.this)
@@ -104,13 +104,13 @@ public class TaskListFragment extends Fragment {
         Toast.makeText(binding.getRoot().getContext(), "Tasks Atualizado", Toast.LENGTH_LONG).show();
     }
 
-    private List<Task> parseTasks(String json) {
-        List<Task> tasks = new ArrayList<>();
+    private List<TaskPromise> parseTasks(String json) {
+        List<TaskPromise> tasks = new ArrayList<>();
         try {
             JSONArray array = new JSONArray(json);
             for (int i = 0; i < array.length(); i++) {
                 JSONObject obj = array.getJSONObject(i);
-                tasks.add(Task.fromJson(obj.toString()));
+                tasks.add(TaskPromise.fromJson(obj.toString()));
             }
         } catch (JSONException e) {
             e.printStackTrace();

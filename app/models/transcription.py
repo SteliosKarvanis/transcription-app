@@ -104,14 +104,34 @@ class Task(BaseModel):
             self.status = TaskStatus.FAILED
             self.ended_at = end_time
 
+    def update_request(self) -> None:
+        self.last_requested_at = datetime.now()
 
-class TaskResponse(Task):
+class TaskResult(BaseModel):
+    task_id: str
+    sender_file_path: str
     output: Optional[str] = None
 
     @classmethod
-    def from_task(cls, task: Task) -> "TaskResponse":
+    def from_task(cls, task: Task) -> "TaskResult":
         output = task.read_output()
         return cls(
-            **task.dict(),  # Unpack the task attributes
+            task_id=task.task_id,
+            sender_file_path=task.sender_file_path,
             output=output,  # Include the output attribute
+        )
+
+class TaskPromise(BaseModel):
+    task_id: str
+    sender_file_path: str
+    status: TaskStatus
+    last_requested_at: datetime
+
+    @classmethod
+    def from_task(cls, task: Task) -> "TaskPromise":
+        return cls(
+            task_id=task.task_id,
+            sender_file_path=task.sender_file_path,
+            status=task.status,
+            last_requested_at=task.last_requested_at,
         )

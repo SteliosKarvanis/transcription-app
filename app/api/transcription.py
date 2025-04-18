@@ -7,12 +7,12 @@ from typing_extensions import List
 from app.auth.utils import get_current_user
 from app.client.transcription import Transcriptor, get_transcriptor
 from app.db.tasks import tasks
-from app.models.transcription import Task, TaskResponse
+from app.models.transcription import Task, TaskPromise, TaskResult
 
 router = APIRouter(prefix="/transcription", dependencies=[Depends(get_current_user)])
 
 
-@router.post("/", response_model=TaskResponse)
+@router.post("/", response_model=TaskPromise)
 async def transcript(
     background_tasks: BackgroundTasks,
     file: UploadFile,
@@ -25,16 +25,17 @@ async def transcript(
     # Check if the task already exists
     existent_task = tasks.get_task_by_id(new_task.task_id, user)
     if existent_task is not None:
-        return TaskResponse.from_task(existent_task)
+        tasks.update_task_request(existent_task.task_id)
+        return TaskPromise.from_task(existent_task)
     # Start task
     tasks.start_task(new_task)
     # Execute Async
     background_tasks.add_task(transcriptor, new_task)
     tasks.queue_task(new_task.task_id)
-    return TaskResponse.from_task(new_task)
+    return TaskPromise.from_task(new_task)
 
 
-@router.get("/task/{task_id}", response_model=TaskResponse)
+@router.get("/task/{task_id}", response_model=TaskResult)
 async def get_transcription(
     task_id: str,
     user: str = Depends(get_current_user),
@@ -42,7 +43,7 @@ async def get_transcription(
     task = tasks.get_task_by_id(task_id, user)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
-    return TaskResponse.from_task(task)
+    return TaskResult.from_task(task)
 
 
 @router.get("/health")

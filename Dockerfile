@@ -6,5 +6,6 @@ COPY ./.env /code/.env
 COPY ./app /code/app
 COPY ./data /code/data
 COPY ./transcriptions /code/transcriptions
+COPY ./tasks_json /code/tasks_json
 
 CMD ["fastapi", "run", "app/main.py"]

@@ -8,6 +8,7 @@ import uuid
 from app.config.config import config
 import subprocess
 
+
 class TaskStatus(str, Enum):
     CREATED = "CREATED"
     QUEUED = "QUEUED"
@@ -55,6 +56,13 @@ class Task(BaseModel):
         return f"{config.TRANSCRIPTIONS_DIR}/{self.user}/{self.task_id}.txt"
 
     @property
+    def output_file_path_json(self) -> str:
+        os.makedirs(config.TASKS_DIR, exist_ok=True)
+        os.makedirs(f"{config.TASKS_DIR}/{self.user}", exist_ok=True)
+
+        return f"{config.TASKS_DIR}/{self.user}/{self.task_id}.json"
+
+    @property
     def active(self) -> bool:
         return self.status in {
             TaskStatus.QUEUED,
@@ -66,7 +74,19 @@ class Task(BaseModel):
         with open(self.local_video_file_path, "wb") as f:
             f.write(content)
         print("Video Saved")
-        process = subprocess.Popen(['ffmpeg', '-y', '-i', self.local_video_file_path, '-q:a', '0', '-map', 'a', self.local_audio_file_path])
+        process = subprocess.Popen(
+            [
+                "ffmpeg",
+                "-y",
+                "-i",
+                self.local_video_file_path,
+                "-q:a",
+                "0",
+                "-map",
+                "a",
+                self.local_audio_file_path,
+            ]
+        )
         process.wait()
         print("Audio Saved")
         os.remove(self.local_video_file_path)
@@ -95,6 +115,8 @@ class Task(BaseModel):
         self.status = TaskStatus.COMPLETED
         with open(self.output_file_path, "w") as f:
             f.write(output)
+        with open(self.output_file_path_json, "w") as f:
+            f.write(self.json())
 
     def refresh(self) -> None:
         """Refresh the task status and check for timeout."""
@@ -106,6 +128,7 @@ class Task(BaseModel):
 
     def update_request(self) -> None:
         self.last_requested_at = datetime.now()
+
 
 class TaskResult(BaseModel):
     task_id: str
@@ -120,6 +143,7 @@ class TaskResult(BaseModel):
             sender_file_path=task.sender_file_path,
             transcription=transcription,  # Include the output attribute
         )
+
 
 class TaskPromise(BaseModel):
     task_id: str

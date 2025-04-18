@@ -16,6 +16,7 @@ class Config:
     USERS_FILE: str = os.getcwd() + "/users.json"
     DATA_DIR: str = os.getcwd() + "/data"
     TRANSCRIPTIONS_DIR: str = os.getcwd() + "/transcriptions"
+    TASKS_DIR: str = os.getcwd() + "/tasks_json"
     TASK_TIMEOUT: int = 5 * 60  # 5 minutes
 
 

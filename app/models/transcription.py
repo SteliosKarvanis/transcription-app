@@ -21,13 +21,15 @@ class Task(BaseModel):
     sender_file_path: str
     user: str
     status: TaskStatus = TaskStatus.CREATED
+    last_requested_at: datetime = Field(default_factory=datetime.now)
     created_at: datetime = Field(default_factory=datetime.now)
     started_at: Optional[datetime] = None
     ended_at: Optional[datetime] = None
 
     @classmethod
     def create_task(cls, user: str, sender_file_path: str, content: bytes) -> "Task":
-        task = cls(user=user, sender_file_path=sender_file_path)
+        task_id = sender_file_path.split("/")[-1].split(".")[0]
+        task = cls(user=user, sender_file_path=sender_file_path, task_id=task_id)
         if not os.path.exists(task.output_file_path):
             # Write content
             task.save_content(content)

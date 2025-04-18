@@ -15,19 +15,24 @@ import android.widget.TextView;
 import com.example.android_client.models.Task;
 import com.example.android_client.databinding.TaskItemBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
-    private final List<Task> tasks;
+    private List<Task> tasks;
     private OnTaskSelectedListener listener;
 
     public interface OnTaskSelectedListener {
         void onTaskSelected(Task task);
     }
-
-    public TaskAdapter(List<Task> tasks, OnTaskSelectedListener listener) {
-        this.tasks = tasks;
+    public void setTasks(List<Task> tasks) {
+        this.tasks.clear();
+        this.tasks.addAll(tasks);
+        notifyDataSetChanged();
+    }
+    public TaskAdapter(OnTaskSelectedListener listener) {
+        this.tasks = new ArrayList<Task>();
         this.listener = listener;
     }
 

@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                     .build();
 
             Request request = new Request.Builder()
-                    .url("http://191.101.235.101/transcription")
+                    .url("http://168.231.89.123/transcription")
                     .addHeader("Authorization", "Bearer " + token)
                     .post(requestBody)
                     .build();

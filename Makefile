@@ -7,7 +7,7 @@ build:
 	docker rmi app:latest
 	docker build -t app .
 run:
-	docker run -p 80:8000 --rm -d app
+	docker run -v /code/data:/root/transcription-app/data -v /code/transcriptions:/root/transcription-app/transcriptions -p 80:8000 --rm -d app
 stop:
 	docker ps --filter "ancestor=app:latest" --format "{{.ID}}" | xargs -r docker stop
 debug:

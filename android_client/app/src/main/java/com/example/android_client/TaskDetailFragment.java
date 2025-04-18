@@ -87,7 +87,7 @@ public class TaskDetailFragment extends Fragment {
         });
 
         // The text you want to print
-        String htmlContent = "<html><body><h3>" + binding.transcription.getText() + "</h3></body></html>";
+        String htmlContent = "<html><body><p>" + binding.transcription.getText() + "</p></body></html>";
         webView.loadDataWithBaseURL(null, htmlContent, "text/HTML", "UTF-8", null);
     }
     private void createPrintJob(WebView webView) {
@@ -107,18 +107,14 @@ public class TaskDetailFragment extends Fragment {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
-                Log.d("Request", "Failed");
-                // Optionally show error in UI
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     // Handle unsuccessful
-                    Log.d("Request", "Failed 2");
                     return;
                 }
-                Log.d("Request", "Successfull");
                 String json = response.body().string();
                 TaskResult taskResult = TaskResult.fromJson(json);
                 getActivity().runOnUiThread(() -> setElements(taskResult));
@@ -126,7 +122,6 @@ public class TaskDetailFragment extends Fragment {
         });
     }
     private void setElements(TaskResult taskResponse) {
-        Log.d("Task", "Setting Transcription: "  + taskResponse.transcription);
         binding.transcription.setText(taskResponse.transcription);
     }
 }

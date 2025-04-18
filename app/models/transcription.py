@@ -64,7 +64,7 @@ class Task(BaseModel):
         with open(self.local_video_file_path, "wb") as f:
             f.write(content)
         print("Video Saved")
-        process = subprocess.Popen(['ffmpeg', '-y', '-i', 'video.mp4', '-q:a', '0', '-map', 'a', 'video.mp3'])
+        process = subprocess.Popen(['ffmpeg', '-y', '-i', self.local_video_file_path, '-q:a', '0', '-map', 'a', self.local_audio_file_path])
         process.wait()
         print("Audio Saved")
         os.remove(self.local_video_file_path)

@@ -1,5 +1,7 @@
 package com.example.android_client.api;
 
+import android.net.Uri;
+
 import com.example.android_client.models.TaskPromise;
 import com.example.android_client.models.TaskResult;
 import com.example.android_client.utils.ApiUtils;
@@ -7,7 +9,6 @@ import com.example.android_client.utils.LocalDateTimeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
     private static final String BASE_URL = "http://168.231.89.123/";
-    private static final String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJob21lcm8ifQ.9caVOOhww0rhFf5jkmtILS-rIKT-NXyeP9g3qqpVQmg";
+    public static final String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJob21lcm8ifQ.9caVOOhww0rhFf5jkmtILS-rIKT-NXyeP9g3qqpVQmg";
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
     private static final Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create(gson)).build();
 
@@ -35,18 +36,16 @@ public class ApiClient {
         Call<TaskResult> call = apiService.getTaskTranscription(token, taskId);
         call.enqueue(ApiUtils.createCallback(handler));
     }
-    public static void transcript(ApiUtils.SuccessHandler<TaskPromise> handler, File file) {
+    public static void transcript(ApiUtils.SuccessHandler<Void> handler, Uri fileUri, byte[] content) {
         ApiInterface apiService = retrofit.create(ApiInterface.class);
-        RequestBody requestBody = RequestBody.create(
-                file,
-                MediaType.parse("video/*")
-        );
-        MultipartBody.Part filePart = MultipartBody.Part.createFormData(
-                "file",
-                file.getName(),
-                requestBody
-        );
-        Call<TaskPromise> call = apiService.transcript(token, filePart);
+
+        RequestBody videoBody = RequestBody.create(content, MediaType.parse("video/mp4"));
+        MultipartBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", fileUri.getPath(), videoBody)
+                .build();
+
+        Call<Void> call = apiService.transcript(token, requestBody);
         call.enqueue(ApiUtils.createCallback(handler));
     }
 }

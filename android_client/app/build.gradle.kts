@@ -44,6 +44,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.legacy.support.v4)
     implementation(libs.gson)
+    implementation(libs.converter.gson)
+    implementation(libs.retrofit)
     implementation(libs.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

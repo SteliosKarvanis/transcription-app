@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "android_client"
+rootProject.name = "Transcrição"
 include(":app")
  

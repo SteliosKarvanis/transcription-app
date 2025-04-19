@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -21,10 +22,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
     private static final String BASE_URL = "http://168.231.89.123/";
-    public static final String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJob21lcm8ifQ.9caVOOhww0rhFf5jkmtILS-rIKT-NXyeP9g3qqpVQmg";
+    public static String token;
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
     private static final Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create(gson)).build();
 
+    public static void authenticate(ApiUtils.SuccessHandler<Map<String, String>> handler, String user, String password){
+        ApiInterface apiService = retrofit.create(ApiInterface.class);
+        Call<Map<String, String>> call = apiService.authenticate(user, password);
+        call.enqueue(ApiUtils.createCallback(handler));
+    }
     public static void getTasks(ApiUtils.SuccessHandler<List<TaskPromise>> handler) {
         ApiInterface apiService = retrofit.create(ApiInterface.class);
         Call<List<TaskPromise>> call = apiService.getTasks(token);

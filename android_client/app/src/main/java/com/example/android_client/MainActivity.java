@@ -3,6 +3,7 @@ package com.example.android_client;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import com.example.android_client.api.ApiClient;
 import com.example.android_client.databinding.ActivityMainBinding;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -47,6 +49,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Check Auth
+        SharedPreferences auth = getSharedPreferences("auth", MODE_PRIVATE);
+        String token = auth.getString("token", null);
+        if(token == null){
+            startActivity(new Intent(MainActivity.this, AuthActivity.class));
+            finish();
+        } else {
+            ApiClient.token = token;
+        }
+        // Initialize View
         super.onCreate(savedInstanceState);
         // Bind the activity layout
         binding = ActivityMainBinding.inflate(getLayoutInflater());

@@ -61,7 +61,7 @@ public class TaskDetailFragment extends Fragment {
                 PrintHandler.createPrintJob(v, view);
             }
         });
-        String htmlContent = "<html><body><p style='font-size: 32px;'>" + binding.transcription.getText() + "</p></body></html>";
+        String htmlContent = "<html><body><p style='font-size: 20px;'>" + binding.transcription.getText() + "</p></body></html>";
         webView.loadDataWithBaseURL(null, htmlContent, "text/HTML", "UTF-8", null);
     }
 
